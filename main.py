@@ -7,7 +7,8 @@ from urllib.parse import quote
 import requests
 from bs4 import BeautifulSoup
 
-# Configuration
+# --- Configuration & Metadata ---
+VERSION = "0.0.1"
 BASE_URL = "https://kisskh.buzz/"
 AJAX_URL = BASE_URL + "wp-admin/admin-ajax.php"
 BLOGGER_BLOG_ID = "1422331367239821646"
@@ -15,19 +16,24 @@ BLOGGER_FEED_URL = f"https://www.blogger.com/feeds/{BLOGGER_BLOG_ID}/posts/defau
 
 
 def clear():
+    """Clears the terminal screen."""
     os.system("clear" if os.name != "nt" else "cls")
 
 
 def draw_header(context=""):
+    """Draws a consistent TUI header with versioning."""
     clear()
+    # Header box with version number
     print("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓")
-    print("┃                 DEHA DRAMA STREAMER (TUI)                 ┃")
+    print(f"┃ DEHA DRAMA STREAMER (TUI)                     v{VERSION} ┃")
     if context:
+        # Centers the context string within the 59-character width
         print(f"┃ {context.center(59)} ┃")
     print("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛")
 
 
 def call_fzf(options, prompt="Select"):
+    """Helper to use fzf for selection. Returns the selected string."""
     try:
         input_str = "\n".join(options)
         process = subprocess.Popen(
@@ -58,7 +64,6 @@ def play_video(url, sub_url, platform):
         return
     try:
         if platform == "1":  # Android (MPV)
-            # Pass subtitle via Intent Extras
             cmd = [
                 "am",
                 "start",
@@ -76,20 +81,20 @@ def play_video(url, sub_url, platform):
             subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
         elif platform == "2":  # iOS (VLC)
-            os.system(
-                f"open vlc://{url}"
-            )  # iOS URL schemes are limited for separate sub files
+            os.system(f"open vlc://{url}")
 
         elif platform == "3":  # Linux (MPV)
             cmd = ["mpv", url]
             if sub_url:
                 cmd.append(f"--sub-file={sub_url}")
+            # Run as a background process
             subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     except:
         pass
 
 
 def get_search_results(query):
+    """Search for dramas via AJAX."""
     payload = {
         "action": "fetch_live_movies",
         "keyword": query,
@@ -116,23 +121,22 @@ def get_search_results(query):
 
 
 def fetch_links(drama_title):
-    """Extracts Video and Subtitle links."""
+    """Extracts Video and Subtitle links from Blogger Feed."""
     feed_url = f"{BLOGGER_FEED_URL}?q={quote(drama_title)}&alt=json&max-results=1"
     try:
         data = requests.get(feed_url, timeout=10).json()
+        if "entry" not in data["feed"]:
+            return []
         content = data["feed"]["entry"][0]["content"]["$t"]
         eps = []
-        # Format: Video_URL | Sub_Langs | Sub_URLs
         for i, part in enumerate(content.split(";"), 1):
             if "|" in part:
                 fields = part.split("|")
                 v_url = fields[0].strip()
                 s_url = ""
                 if len(fields) > 2:
-                    # Get first subtitle URL if multiple exist (comma separated)
                     subs = fields[2].strip().split(",")
                     s_url = subs[0] if subs else ""
-
                 if v_url.startswith("http"):
                     eps.append({"label": f"Episode {i}", "url": v_url, "sub": s_url})
         return eps
@@ -141,11 +145,12 @@ def fetch_links(drama_title):
 
 
 def playback_controller(episodes, start_idx, drama_title, platform):
+    """TUI Loop for controlling playback (Next/Prev)."""
     current_idx = start_idx
     while True:
         ep = episodes[current_idx]
-        sub_status = "(With Subtitles)" if ep["sub"] else "(No Subtitles Found)"
-        draw_header(f"Playing: {drama_title} > {ep['label']} {sub_status}")
+        sub_info = "(Subtitles Loaded)" if ep["sub"] else "(No Subtitles)"
+        draw_header(f"Playing: {drama_title} > {ep['label']} {sub_info}")
 
         play_video(ep["url"], ep["sub"], platform)
 
@@ -170,6 +175,9 @@ def playback_controller(episodes, start_idx, drama_title, platform):
 
 def main():
     clear()
+    print("==========================================")
+    print(f"       DEHA DRAMA STREAMER v{VERSION}      ")
+    print("==========================================")
     print("1. Android (MPV) | 2. iOS (VLC) | 3. Linux (MPV) | 4. URL Only")
     platform = input("Select Environment: ").strip()
 
@@ -209,7 +217,7 @@ def main():
                 break
 
     clear()
-    print("Goodbye!")
+    print(f"Deha Streamer v{VERSION} - Goodbye!")
 
 
 if __name__ == "__main__":
@@ -217,4 +225,5 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         clear()
+        sys.exit(0)
         sys.exit(0)
