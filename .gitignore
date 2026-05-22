@@ -1,0 +1,67 @@
+# --- uv / Virtual Environments ---
+# uv creates a .venv folder by default
+.venv/
+venv/
+ENV/
+env/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# --- Environment Variables ---
+# Never commit secrets
+.env
+.env.local
+.env.*
+.venv
+
+# --- Unit test / Coverage ---
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# --- IDEs / Editors ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- OS Specific ---
+.DS_Store
+Thumbs.db
+
+# --- uv specific note ---
+# DO NOT ignore uv.lock. 
+# uv.lock ensures everyone on your team uses the same versions.
+# .python-version (created by uv python pin) is also usually committed.
