@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}{{ drama_title }} - Deha Scraper{% endblock %}
+
+{% block content %}
+    <div class="drama-detail-container">
+        <h1>{{ drama_title }}</h1>
+        {% if drama_image_url and drama_image_url != 'N/A' %}
+            <div class="drama-image-wrapper">
+                <img src="{{ drama_image_url }}" alt="{{ drama_title }}" class="drama-detail-image">
+            </div>
+        {% endif %}
+
+        <h2>Episodes</h2>
+        {% if episodes %}
+            <ul class="episode-list">
+                {% for episode in episodes %}
+                    <li>
+                        <span class="episode-label">{{ loop.index }}. {{ episode['episode_number'] }}</span>
+                        <a href="{{ episode['episode_link'] }}" target="_blank" rel="noopener" class="episode-page-link">Page</a>
+                        <a href="{{ url_for('watch_episode', drama_link=drama_link, drama_title=drama_title, episode=episode.get('episode_index', loop.index), video_url=episode.get('video_url', '')) }}" class="episode-play-link">Play</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No episodes found for this drama.</p>
+        {% endif %}
+    </div>
+{% endblock %}

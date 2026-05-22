@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}{{ drama_title }} - EP.{{ episode_num }}{% endblock %}
+
+{% block content %}
+    <div class="watch-container">
+        <h1>{{ drama_title }} — Episode {{ episode_num }}</h1>
+        <p class="episode-page-link">
+            <a href="{{ episode_link }}" target="_blank" rel="noopener">Open on kisskh</a>
+        </p>
+
+        {% if video_url %}
+            <div class="video-player-wrapper">
+                <video class="episode-player" controls playsinline preload="metadata" src="{{ video_url }}">
+                    Your browser does not support HTML5 video.
+                </video>
+            </div>
+            <p class="video-source-note">Streaming from scraped source URL.</p>
+        {% else %}
+            <p class="video-error">Could not load a direct video URL for this episode. Try opening the kisskh page instead.</p>
+        {% endif %}
+
+        <p><a href="{{ url_for('drama_detail', drama_link_encoded=drama_link) }}">&larr; Back to episodes</a></p>
+    </div>
+{% endblock %}

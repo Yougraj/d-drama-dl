@@ -1,0 +1,286 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+header {
+    background-color: #333;
+    color: white;
+    padding: 1em 0;
+    text-align: center;
+}
+
+header nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+header nav .logo {
+    color: white;
+    text-decoration: none;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+header nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+header nav ul li {
+    margin-left: 20px;
+}
+
+header nav ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 5px 10px;
+    transition: background-color 0.3s ease;
+}
+
+header nav ul li a:hover {
+    background-color: #555;
+    border-radius: 4px;
+}
+
+main {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+h1, h2 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.search-bar-home, .search-form {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.search-bar-home form, .search-form form {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    max-width: 600px;
+}
+
+.search-bar-home input[type="text"], .search-form input[type="text"], .search-form select {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+.search-bar-home button, .search-form button, .button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.search-bar-home button:hover, .search-form button:hover, .button:hover {
+    background-color: #0056b3;
+}
+
+.drama-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.drama-card {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease;
+}
+
+.drama-card:hover {
+    transform: translateY(-5px);
+}
+
+.drama-card a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.drama-card img {
+    width: 100%;
+    height: 250px; /* Fixed height for consistency */
+    object-fit: cover;
+    display: block;
+}
+
+.drama-card .card-info {
+    padding: 10px;
+    position: relative;
+}
+
+.drama-card h3 {
+    font-size: 1.1em;
+    margin: 0 0 5px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.episode-tag, .quality-tag {
+    display: inline-block;
+    background-color: #28a745;
+    color: white;
+    font-size: 0.75em;
+    padding: 3px 6px;
+    border-radius: 3px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+.quality-tag {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.drama-detail-container {
+    padding: 20px;
+}
+
+.drama-detail-container h1 {
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+.drama-detail-container p a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.drama-detail-container p a:hover {
+    text-decoration: underline;
+}
+
+.episode-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+.episode-list li {
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    margin-bottom: 10px;
+    padding: 10px 15px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.episode-list li a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.episode-list li a:hover {
+    text-decoration: underline;
+}
+
+.episode-list .episode-label {
+    flex: 1;
+    font-weight: 600;
+}
+
+.episode-list .episode-page-link,
+.episode-list .episode-play-link {
+    margin-left: 12px;
+}
+
+.episode-list .episode-play-link {
+    color: #28a745;
+}
+
+.watch-container {
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.video-player-wrapper {
+    margin: 20px 0;
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.episode-player {
+    width: 100%;
+    max-height: 70vh;
+    display: block;
+}
+
+.video-error {
+    color: #c0392b;
+}
+
+.video-source-note,
+.episode-page-link {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.drama-image-wrapper {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.drama-detail-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-height: 400px; /* Limit height for detail page image */
+    object-fit: contain; /* Ensure the whole image is visible */
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.pagination span {
+    font-weight: bold;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 30px;
+    background-color: #333;
+    color: white;
+    border-radius: 0 0 8px 8px;
+}
