@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Watching {{ title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+  </head>
+  <body class="bg-black text-white p-4">
+    <a href="/" class="text-pink-500 mb-4 inline-block">← Back to Home</a>
+
+    <div class="max-w-5xl mx-auto">
+      <h1 class="text-2xl font-bold mb-6 text-center text-pink-200">
+        Watching: {{ title }}
+      </h1>
+
+      <div class="rounded-xl overflow-hidden shadow-2xl bg-gray-900 mb-8">
+        <video id="player" playsinline controls class="w-full">
+          <source id="videoSource" src="" type="video/mp4" />
+          <track
+            id="subSource"
+            kind="subtitles"
+            srclang="en"
+            src=""
+            label="English"
+            default
+          />
+        </video>
+      </div>
+
+      <div class="grid grid-cols-4 md:grid-cols-8 gap-3">
+        {% for ep in episodes %}
+        <button
+          onclick="changeEpisode('{{ ep.url }}', '{{ ep.sub }}', '{{ ep.label }}')"
+          class="ep-btn p-3 bg-gray-800 hover:bg-pink-600 rounded-lg text-sm transition"
+        >
+          {{ loop.index }}
+        </button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+    <script>
+      const player = new Plyr("#player");
+      const video = document.getElementById("player");
+      const source = document.getElementById("videoSource");
+      const track = document.getElementById("subSource");
+
+      function changeEpisode(url, sub, label) {
+        source.src = url;
+        track.src = sub;
+        player.source = {
+          type: "video",
+          title: label,
+          sources: [{ src: url, type: "video/mp4" }],
+          tracks: [
+            {
+              kind: "subtitles",
+              label: "English",
+              srclang: "en",
+              src: sub,
+              default: true,
+            },
+          ],
+        };
+        player.play();
+
+        // Highlight active button
+        document
+          .querySelectorAll(".ep-btn")
+          .forEach((btn) => btn.classList.remove("bg-pink-600"));
+        event.target.classList.add("bg-pink-600");
+      }
+    </script>
+  </body>
+</html>

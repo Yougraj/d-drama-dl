@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Suku's Cinema</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        background-color: #141414;
+        color: white;
+      }
+      .netflix-card:hover {
+        transform: scale(1.05);
+        transition: 0.3s;
+      }
+    </style>
+  </head>
+  <body class="p-8">
+    <nav class="flex justify-between items-center mb-10">
+      <h1 class="text-pink-500 text-4xl font-black">SUKU FLIX</h1>
+      <div class="flex gap-4">
+        <input
+          id="searchInput"
+          type="text"
+          placeholder="Search dramas for you..."
+          class="p-2 w-80 bg-gray-900 border border-gray-700 rounded-full px-6 focus:outline-none focus:border-pink-500"
+        />
+        <a href="/logout" class="text-gray-400 hover:text-white mt-2">Logout</a>
+      </div>
+    </nav>
+
+    <!-- History Section -->
+    {% if history %}
+    <h2 class="text-2xl font-bold mb-4 text-pink-200">
+      Continue Watching for Sudarshona
+    </h2>
+    <div class="flex gap-4 overflow-x-auto pb-8 mb-10">
+      {% for item in history %}
+      <a
+        href="/drama?title={{ item.title|urlencode }}&link={{ item.link|urlencode }}&image={{ item.image|urlencode }}"
+        class="min-w-[200px] netflix-card"
+      >
+        <img
+          src="{{ item.image }}"
+          class="rounded-lg h-32 w-full object-cover shadow-lg"
+        />
+        <p class="mt-2 text-sm font-medium truncate">{{ item.title }}</p>
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Search Results -->
+    <h2 id="resultTitle" class="text-2xl font-bold mb-4 hidden">
+      Search Results
+    </h2>
+    <div id="resultsGrid" class="grid grid-cols-2 md:grid-cols-5 gap-6"></div>
+
+    <script>
+      const searchInput = document.getElementById("searchInput");
+      const resultsGrid = document.getElementById("resultsGrid");
+      const resultTitle = document.getElementById("resultTitle");
+
+      searchInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          const query = searchInput.value;
+          resultTitle.classList.remove("hidden");
+          resultsGrid.innerHTML =
+            '<p class="text-pink-400">Searching for you, my love...</p>';
+
+          fetch(`/search?q=${query}`)
+            .then((res) => res.json())
+            .then((data) => {
+              resultsGrid.innerHTML = "";
+              data.forEach((item) => {
+                resultsGrid.innerHTML += `
+                                <a href="/drama?title=${encodeURIComponent(item.title)}&link=${encodeURIComponent(item.link)}&image=${encodeURIComponent(item.image)}" class="netflix-card">
+                                    <div class="relative">
+                                        <img src="${item.image}" class="rounded-lg w-full h-64 object-cover">
+                                        <span class="absolute bottom-2 right-2 bg-pink-600 text-xs px-2 py-1 rounded">${item.ep}</span>
+                                    </div>
+                                    <p class="mt-2 font-bold">${item.title}</p>
+                                </a>
+                            `;
+              });
+            });
+        }
+      });
+    </script>
+  </body>
+</html>
