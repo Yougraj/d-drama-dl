@@ -1,90 +1,88 @@
-<!doctype html>
-<html>
-  <head>
-    <title>Suku's Cinema</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Suku Flix</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-      body {
-        background-color: #141414;
-        color: white;
-      }
-      .netflix-card:hover {
-        transform: scale(1.05);
-        transition: 0.3s;
-      }
+        body { background-color: #141414; color: white; scroll-behavior: smooth; }
+        .netflix-row::-webkit-scrollbar { display: none; }
+        .movie-card:hover { transform: scale(1.05); z-index: 10; }
     </style>
-  </head>
-  <body class="p-8">
-    <nav class="flex justify-between items-center mb-10">
-      <h1 class="text-pink-500 text-4xl font-black">SUKU FLIX</h1>
-      <div class="flex gap-4">
-        <input
-          id="searchInput"
-          type="text"
-          placeholder="Search dramas for you..."
-          class="p-2 w-80 bg-gray-900 border border-gray-700 rounded-full px-6 focus:outline-none focus:border-pink-500"
-        />
-        <a href="/logout" class="text-gray-400 hover:text-white mt-2">Logout</a>
-      </div>
+</head>
+<body class="pb-20">
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-50 bg-black bg-opacity-90 px-6 py-4 flex items-center justify-between">
+        <h1 class="text-pink-600 text-3xl font-black tracking-tighter">SUKU FLIX</h1>
+        <div class="flex items-center gap-6">
+            <div class="relative">
+                <input id="searchBar" type="text" placeholder="Search for your favorites..." 
+                class="bg-black border border-gray-600 text-sm rounded-full py-2 px-10 w-64 focus:w-80 transition-all outline-none focus:border-pink-500">
+                <span class="absolute left-3 top-2">🔍</span>
+            </div>
+            <a href="/logout" class="text-sm text-gray-400 hover:text-white">Logout</a>
+        </div>
     </nav>
 
-    <!-- History Section -->
+    <!-- History Row -->
     {% if history %}
-    <h2 class="text-2xl font-bold mb-4 text-pink-200">
-      Continue Watching for Sudarshona
-    </h2>
-    <div class="flex gap-4 overflow-x-auto pb-8 mb-10">
-      {% for item in history %}
-      <a
-        href="/drama?title={{ item.title|urlencode }}&link={{ item.link|urlencode }}&image={{ item.image|urlencode }}"
-        class="min-w-[200px] netflix-card"
-      >
-        <img
-          src="{{ item.image }}"
-          class="rounded-lg h-32 w-full object-cover shadow-lg"
-        />
-        <p class="mt-2 text-sm font-medium truncate">{{ item.title }}</p>
-      </a>
-      {% endfor %}
+    <div class="mt-10 px-6">
+        <h2 class="text-xl font-bold mb-4 text-pink-200">Continue Watching for Sudarshona</h2>
+        <div class="flex gap-4 overflow-x-auto netflix-row pb-4">
+            {% for item in history %}
+            <a href="/watch?title={{ item.title|urlencode }}&link={{ item.link|urlencode }}&image={{ item.image|urlencode }}" 
+               class="min-w-[240px] movie-card transition duration-300">
+                <img src="{{ item.image }}" class="rounded shadow-lg h-36 w-full object-cover border border-gray-800">
+                <p class="mt-2 text-sm font-semibold truncate">{{ item.title }}</p>
+            </a>
+            {% endfor %}
+        </div>
     </div>
     {% endif %}
 
-    <!-- Search Results -->
-    <h2 id="resultTitle" class="text-2xl font-bold mb-4 hidden">
-      Search Results
-    </h2>
-    <div id="resultsGrid" class="grid grid-cols-2 md:grid-cols-5 gap-6"></div>
+    <!-- Dynamic Search Section -->
+    <div id="searchSection" class="mt-10 px-6 hidden">
+        <h2 id="searchTitle" class="text-xl font-bold mb-6">Search Results</h2>
+        <div id="resultsGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6"></div>
+    </div>
 
     <script>
-      const searchInput = document.getElementById("searchInput");
-      const resultsGrid = document.getElementById("resultsGrid");
-      const resultTitle = document.getElementById("resultTitle");
+        const searchBar = document.getElementById('searchBar');
+        const searchSection = document.getElementById('searchSection');
+        const resultsGrid = document.getElementById('resultsGrid');
 
-      searchInput.addEventListener("keypress", function (e) {
-        if (e.key === "Enter") {
-          const query = searchInput.value;
-          resultTitle.classList.remove("hidden");
-          resultsGrid.innerHTML =
-            '<p class="text-pink-400">Searching for you, my love...</p>';
-
-          fetch(`/search?q=${query}`)
-            .then((res) => res.json())
-            .then((data) => {
-              resultsGrid.innerHTML = "";
-              data.forEach((item) => {
-                resultsGrid.innerHTML += `
-                                <a href="/drama?title=${encodeURIComponent(item.title)}&link=${encodeURIComponent(item.link)}&image=${encodeURIComponent(item.image)}" class="netflix-card">
-                                    <div class="relative">
-                                        <img src="${item.image}" class="rounded-lg w-full h-64 object-cover">
-                                        <span class="absolute bottom-2 right-2 bg-pink-600 text-xs px-2 py-1 rounded">${item.ep}</span>
+        searchBar.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const q = searchBar.value;
+                if (!q) return;
+                
+                searchSection.classList.remove('hidden');
+                resultsGrid.innerHTML = '<p class="text-pink-500 animate-pulse">Finding beautiful stories for you...</p>';
+                
+                fetch(`/api/search?q=${encodeURIComponent(q)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        resultsGrid.innerHTML = '';
+                        if (data.length === 0) {
+                            resultsGrid.innerHTML = '<p class="text-gray-500">No dramas found, try another title, love.</p>';
+                        }
+                        data.forEach(item => {
+                            resultsGrid.innerHTML += `
+                                <a href="/watch?title=${encodeURIComponent(item.title)}&link=${encodeURIComponent(item.link)}&image=${encodeURIComponent(item.image)}" 
+                                   class="movie-card transition duration-300 group">
+                                    <div class="relative overflow-hidden rounded shadow-xl">
+                                        <img src="${item.image}" class="w-full h-72 object-cover">
+                                        <div class="absolute bottom-0 p-2 bg-gradient-to-t from-black w-full">
+                                            <span class="text-xs bg-pink-600 px-2 py-0.5 rounded">${item.ep}</span>
+                                        </div>
                                     </div>
-                                    <p class="mt-2 font-bold">${item.title}</p>
+                                    <p class="mt-2 text-sm font-bold truncate group-hover:text-pink-500">${item.title}</p>
                                 </a>
                             `;
-              });
-            });
-        }
-      });
+                        });
+                        window.scrollTo(0, searchSection.offsetTop - 100);
+                    });
+            }
+        });
     </script>
-  </body>
+</body>
 </html>

@@ -1,43 +1,34 @@
-<!doctype html>
-<html>
-  <head>
-    <title>Welcome Sudarshona</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suku's Sanctuary</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-      body {
-        background: linear-gradient(135deg, #141414 0%, #2d0a1a 100%);
-      }
+        body { background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=2000'); background-size: cover; }
     </style>
-  </head>
-  <body class="flex items-center justify-center h-screen">
-    <div
-      class="bg-black bg-opacity-80 p-10 rounded-2xl shadow-2xl w-96 border border-pink-900"
-    >
-      <h1 class="text-pink-500 text-3xl font-bold mb-8 text-center">
-        Hello Suku! ❤️
-      </h1>
-      <form method="POST" class="space-y-6">
-        <input
-          type="text"
-          name="username"
-          placeholder="Username"
-          class="w-full p-3 bg-gray-800 text-white rounded focus:outline-none border-b-2 border-transparent focus:border-pink-500"
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          class="w-full p-3 bg-gray-800 text-white rounded focus:outline-none border-b-2 border-transparent focus:border-pink-500"
-        />
-        <button
-          class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded transition duration-300"
-        >
-          Enter My World
-        </button>
-      </form>
-      {% if error %}
-      <p class="text-red-400 mt-4 text-sm text-center">{{ error }}</p>
-      {% endif %}
+</head>
+<body class="flex items-center justify-center min-h-screen">
+    <div class="bg-black bg-opacity-80 p-10 rounded-xl shadow-2xl w-full max-w-md border border-pink-900 mx-4">
+        <div class="text-center mb-8">
+            <h1 class="text-pink-500 text-4xl font-black mb-2">SUKU FLIX</h1>
+            <p class="text-gray-400">Welcome Home, Sudarshona ❤️</p>
+        </div>
+        <form method="POST" class="space-y-6">
+            <div>
+                <input type="text" name="username" placeholder="Username" required 
+                class="w-full p-4 bg-gray-800 text-white rounded focus:ring-2 focus:ring-pink-500 outline-none border-none">
+            </div>
+            <div>
+                <input type="password" name="password" placeholder="Password" required 
+                class="w-full p-4 bg-gray-800 text-white rounded focus:ring-2 focus:ring-pink-500 outline-none border-none">
+            </div>
+            <button type="submit" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-4 rounded-lg shadow-lg transform transition active:scale-95">
+                Sign In
+            </button>
+        </form>
+        {% if error %}<p class="text-red-500 mt-4 text-center text-sm font-medium">{{ error }}</p>{% endif %}
     </div>
-  </body>
+</body>
 </html>

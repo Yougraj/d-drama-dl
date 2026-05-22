@@ -7,32 +7,34 @@ from bs4 import BeautifulSoup
 from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 
 app = Flask(__name__)
-app.secret_key = "suku_secret_key_123"
+app.secret_key = "suku_love_secret_key_99"  # Change this to anything random
 
-# Metadata
+# Configuration
 USER_CREDENTIALS = {"username": "Sudarshona", "password": "Suku#2005"}
 HISTORY_FILE = "history.json"
-
-# Scraper Configuration
-BASE_URL = "https://kisskh.buzz/"
-AJAX_URL = BASE_URL + "wp-admin/admin-ajax.php"
 BLOGGER_FEED_URL = "https://www.blogger.com/feeds/1422331367239821646/posts/default"
+AJAX_URL = "https://kisskh.buzz/wp-admin/admin-ajax.php"
+
+# --- Helper Functions ---
 
 
-def get_history():
+def load_history():
     if not os.path.exists(HISTORY_FILE):
         return []
-    with open(HISTORY_FILE, "r") as f:
-        return json.load(f)
+    try:
+        with open(HISTORY_FILE, "r") as f:
+            return json.load(f)
+    except:
+        return []
 
 
-def add_to_history(title, link, image):
-    history = get_history()
-    # Remove duplicate if exists
+def save_history(title, link, image):
+    history = load_history()
+    # Remove if already exists (to move to top)
     history = [item for item in history if item["link"] != link]
     history.insert(0, {"title": title, "link": link, "image": image})
     with open(HISTORY_FILE, "w") as f:
-        json.dump(history[:20], f)
+        json.dump(history[:20], f)  # Keep last 20
 
 
 def scrape_search(query):
@@ -71,6 +73,8 @@ def fetch_episodes(drama_title):
     feed_url = f"{BLOGGER_FEED_URL}?q={quote(drama_title)}&alt=json&max-results=1"
     try:
         data = requests.get(feed_url, timeout=10).json()
+        if "entry" not in data["feed"]:
+            return []
         content = data["feed"]["entry"][0]["content"]["$t"]
         eps = []
         for i, part in enumerate(content.split(";"), 1):
@@ -79,20 +83,23 @@ def fetch_episodes(drama_title):
                 v_url = fields[0].strip()
                 s_url = fields[2].strip().split(",")[0] if len(fields) > 2 else ""
                 if v_url.startswith("http"):
-                    eps.append({"label": f"Episode {i}", "url": v_url, "sub": s_url})
+                    eps.append({"label": f"EP {i}", "url": v_url, "sub": s_url})
         return eps
     except:
         return []
 
 
+# --- Routes ---
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        if (
-            request.form["username"] == USER_CREDENTIALS["username"]
-            and request.form["password"] == USER_CREDENTIALS["password"]
-        ):
+        user = request.form.get("username")
+        pw = request.form.get("password")
+        if user == USER_CREDENTIALS["username"] and pw == USER_CREDENTIALS["password"]:
             session["logged_in"] = True
+            session["user"] = user
             return redirect(url_for("index"))
         return render_template("login.html", error="Invalid Password, My Love!")
     return render_template("login.html")
@@ -102,23 +109,26 @@ def login():
 def index():
     if not session.get("logged_in"):
         return redirect(url_for("login"))
-    history = get_history()
-    return render_template("index.html", history=history)
+    return render_template("index.html", history=load_history())
 
 
-@app.route("/search")
-def search():
-    query = request.args.get("q")
-    results = scrape_search(query)
-    return jsonify(results)
+@app.route("/api/search")
+def api_search():
+    if not session.get("logged_in"):
+        return jsonify([])
+    query = request.args.get("q", "")
+    return jsonify(scrape_search(query))
 
 
-@app.route("/drama")
-def drama():
+@app.route("/watch")
+def watch():
+    if not session.get("logged_in"):
+        return redirect(url_for("login"))
     title = request.args.get("title")
     link = request.args.get("link")
     image = request.args.get("image")
-    add_to_history(title, link, image)
+
+    save_history(title, link, image)
     episodes = fetch_episodes(title)
     return render_template("player.html", title=title, episodes=episodes)
 
@@ -130,4 +140,6 @@ def logout():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    # Use environment port for deployment (Render/Railway)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)

@@ -1,76 +1,68 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>Watching {{ title }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-  </head>
-  <body class="bg-black text-white p-4">
-    <a href="/" class="text-pink-500 mb-4 inline-block">← Back to Home</a>
+</head>
+<body class="bg-[#0a0a0a] text-white">
+    <div class="p-6">
+        <a href="/" class="text-pink-500 font-bold hover:underline">← Back to Dashboard</a>
+    </div>
 
-    <div class="max-w-5xl mx-auto">
-      <h1 class="text-2xl font-bold mb-6 text-center text-pink-200">
-        Watching: {{ title }}
-      </h1>
+    <div class="max-w-6xl mx-auto px-4">
+        <h1 class="text-2xl font-bold mb-6 text-pink-100">{{ title }}</h1>
+        
+        <!-- Video Container -->
+        <div class="rounded-2xl overflow-hidden shadow-2xl bg-black border border-gray-800">
+            <video id="player" playsinline controls class="w-full aspect-video">
+                <source id="videoSource" src="" type="video/mp4" />
+                <track id="subSource" kind="subtitles" srclang="en" label="English" default>
+            </video>
+        </div>
 
-      <div class="rounded-xl overflow-hidden shadow-2xl bg-gray-900 mb-8">
-        <video id="player" playsinline controls class="w-full">
-          <source id="videoSource" src="" type="video/mp4" />
-          <track
-            id="subSource"
-            kind="subtitles"
-            srclang="en"
-            src=""
-            label="English"
-            default
-          />
-        </video>
-      </div>
-
-      <div class="grid grid-cols-4 md:grid-cols-8 gap-3">
-        {% for ep in episodes %}
-        <button
-          onclick="changeEpisode('{{ ep.url }}', '{{ ep.sub }}', '{{ ep.label }}')"
-          class="ep-btn p-3 bg-gray-800 hover:bg-pink-600 rounded-lg text-sm transition"
-        >
-          {{ loop.index }}
-        </button>
-        {% endfor %}
-      </div>
+        <!-- Episode Selector -->
+        <div class="mt-10 mb-20">
+            <h3 class="text-lg font-bold mb-4 text-gray-400 uppercase tracking-widest">Select Episode</h3>
+            <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-10 gap-3">
+                {% for ep in episodes %}
+                <button onclick="changeEpisode('{{ ep.url }}', '{{ ep.sub }}', this)" 
+                        class="ep-btn py-3 bg-gray-900 border border-gray-700 rounded hover:border-pink-500 hover:text-pink-500 transition font-medium">
+                    {{ loop.index }}
+                </button>
+                {% endfor %}
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
     <script>
-      const player = new Plyr("#player");
-      const video = document.getElementById("player");
-      const source = document.getElementById("videoSource");
-      const track = document.getElementById("subSource");
+        const player = new Plyr('#player', {
+            tooltips: { controls: true, seek: true },
+            captions: { active: true, update: true }
+        });
 
-      function changeEpisode(url, sub, label) {
-        source.src = url;
-        track.src = sub;
-        player.source = {
-          type: "video",
-          title: label,
-          sources: [{ src: url, type: "video/mp4" }],
-          tracks: [
-            {
-              kind: "subtitles",
-              label: "English",
-              srclang: "en",
-              src: sub,
-              default: true,
-            },
-          ],
-        };
-        player.play();
+        function changeEpisode(url, sub, btn) {
+            const video = document.querySelector('video');
+            
+            player.source = {
+                type: 'video',
+                sources: [{ src: url, type: 'video/mp4' }],
+                tracks: [{ kind: 'subtitles', label: 'English', srclang: 'en', src: sub, default: true }]
+            };
+            
+            player.play();
 
-        // Highlight active button
-        document
-          .querySelectorAll(".ep-btn")
-          .forEach((btn) => btn.classList.remove("bg-pink-600"));
-        event.target.classList.add("bg-pink-600");
-      }
+            // UI Refresh
+            document.querySelectorAll('.ep-btn').forEach(b => {
+                b.classList.remove('bg-pink-600', 'border-pink-600', 'text-white');
+                b.classList.add('bg-gray-900', 'border-gray-700');
+            });
+            btn.classList.add('bg-pink-600', 'border-pink-600', 'text-white');
+            btn.classList.remove('bg-gray-900', 'border-gray-700');
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     </script>
-  </body>
+</body>
 </html>
